@@ -46,13 +46,9 @@ public class PartyCreatedEventProcessService implements VillagerEventProcessServ
                     List<Member> tagAttentionMember = memberQueryRepository
                             .getTagAttentionMember(body.getTownId(), tag, i, (i + notifyBatchSize) - 1);
                     if(tagAttentionMember != null && tagAttentionMember.size() > 0) {
-                        log.info("전송! : {}", loop);
-
                         for (Member member : tagAttentionMember) {
                             SseEmitter emitter = eventChannel.getEmitter(member.getId());
-                            eventChannel.sendToClient(emitter,
-                                    member.getId(),
-                                    body);
+                            eventChannel.sendToClient(emitter, member.getId(), body);
                         }
                     }
                 }
