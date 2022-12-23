@@ -1,11 +1,13 @@
 package com.villager.batchserver.event.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.villager.batchserver.config.properties.PartyProperties;
 import com.villager.batchserver.event.body.PartyCreatedBody;
 import com.villager.batchserver.event.channels.PartyCreatedEventChannel;
 import com.villager.batchserver.event.consumer.VillagerEvent;
 import com.villager.batchserver.event.domain.Member;
 import com.villager.batchserver.event.domain.MemberQueryRepository;
+import com.villager.batchserver.event.dto.PartyCreatedDto;
 import com.villager.batchserver.event.service.VillagerEventProcessService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,8 +23,7 @@ import static com.villager.batchserver.event.consumer.VillagerEventType.PARTY_CR
 @RequiredArgsConstructor
 @Slf4j
 public class PartyCreatedEventProcessService implements VillagerEventProcessService {
-    @Value("${party.notify.batch-size}")
-    private int notifyBatchSize;
+    private final PartyProperties partyProperties;
     private final MemberQueryRepository memberQueryRepository;
     private final PartyCreatedEventChannel eventChannel;
     private final ObjectMapper mapper;
@@ -40,15 +41,18 @@ public class PartyCreatedEventProcessService implements VillagerEventProcessServ
         for (String tag : body.getTags()) {
             long tagTotalCount = memberQueryRepository.getTagTotalCount(body.getTownId(), tag);
 
+            int batchSize = partyProperties.getNotify().getBatchSize();
             if(tagTotalCount > 0) {
-                int loop = ((int) (tagTotalCount / notifyBatchSize)) + 1;
+                int loop = ((int) (tagTotalCount / batchSize)) + 1;
                 for (int i = 0; i < loop; i++) {
                     List<Member> tagAttentionMember = memberQueryRepository
-                            .getTagAttentionMember(body.getTownId(), tag, i, (i + notifyBatchSize) - 1);
+                            .getTagAttentionMember(body.getTownId(), tag, i, (i + batchSize) - 1);
                     if(tagAttentionMember != null && tagAttentionMember.size() > 0) {
                         for (Member member : tagAttentionMember) {
                             SseEmitter emitter = eventChannel.getEmitter(member.getId());
-                            eventChannel.sendToClient(emitter, member.getId(), body);
+                            eventChannel.sendToClient(emitter, member.getId(),
+                                    PartyCreatedDto.createPartyCreated(body, tag));
+                            // log.info("sendToClient : {}", member.getId());
                         }
                     }
                 }

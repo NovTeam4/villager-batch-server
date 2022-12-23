@@ -5,6 +5,7 @@ party:
   notify:
     batch-size: 100
     time-out: 600000
+  name: party-create
 
 jasypt:
   encryptor:

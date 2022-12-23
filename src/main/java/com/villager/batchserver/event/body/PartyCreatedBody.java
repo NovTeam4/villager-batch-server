@@ -13,6 +13,7 @@ import java.util.List;
 @Builder
 public class PartyCreatedBody {
     private Long townId;
+    private String townName;
     private Double latitude;
     private Double longitude;
     private int mannerPoint;

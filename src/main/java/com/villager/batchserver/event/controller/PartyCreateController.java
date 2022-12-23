@@ -20,6 +20,7 @@ public class PartyCreateController {
     @CrossOrigin(allowedHeaders = "*")
     @GetMapping(value = "/subscribe/{memberId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter subscribe(@PathVariable Long memberId) {
+        // log.info("subscribe : {}", memberId);
         return partyChannels.subscribe(memberId);
     }
 

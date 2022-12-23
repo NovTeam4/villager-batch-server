@@ -11,10 +11,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableEncryptableProperties
 public class JasyptConfig {
-    @Value("${jasypt.encryptor.password}")
-    private String password;
     @Bean
-    public StringEncryptor jasyptStringEncryptor() {
+    public StringEncryptor jasyptStringEncryptor(@Value("${jasypt.encryptor.password}") String password) {
         PooledPBEStringEncryptor encryptor = new PooledPBEStringEncryptor();
         SimpleStringPBEConfig config = new SimpleStringPBEConfig();
         config.setPassword(password); // 암호화 키
