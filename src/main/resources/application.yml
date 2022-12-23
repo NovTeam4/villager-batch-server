@@ -4,7 +4,7 @@ server:
 party:
   notify:
     batch-size: 100
-    time-out: 3600000
+    time-out: 600000
 
 jasypt:
   encryptor:
