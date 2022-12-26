@@ -9,7 +9,7 @@ import javax.persistence.*;
 public class MemberTown {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "member_town")
+    @Column(name = "member_town_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
