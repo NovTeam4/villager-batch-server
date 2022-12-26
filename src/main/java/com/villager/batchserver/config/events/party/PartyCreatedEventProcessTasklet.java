@@ -7,6 +7,7 @@ import com.villager.batchserver.event.domain.Member;
 import com.villager.batchserver.event.domain.repository.MemberQueryRepository;
 import com.villager.batchserver.event.dto.PartyCreatedDto;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -19,6 +20,7 @@ import java.util.List;
 import static com.villager.batchserver.config.events.party.PartyCreatedEventBatchConfig.PARTY_CREATED_EVENT_BATCH_CONFIG_KEY;
 import static org.springframework.batch.repeat.RepeatStatus.FINISHED;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class PartyCreatedEventProcessTasklet implements Tasklet {
