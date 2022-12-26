@@ -3,7 +3,7 @@ package com.villager.batchserver.event.infra;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.villager.batchserver.event.domain.Member;
-import com.villager.batchserver.event.domain.MemberQueryRepository;
+import com.villager.batchserver.event.domain.repository.MemberQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

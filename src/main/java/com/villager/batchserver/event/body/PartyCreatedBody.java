@@ -5,13 +5,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PartyCreatedBody {
+public class PartyCreatedBody implements Serializable {
     private Long townId;
     private String townName;
     private Double latitude;

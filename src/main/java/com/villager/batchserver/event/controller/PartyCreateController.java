@@ -23,5 +23,4 @@ public class PartyCreateController {
         // log.info("subscribe : {}", memberId);
         return partyChannels.subscribe(memberId);
     }
-
 }

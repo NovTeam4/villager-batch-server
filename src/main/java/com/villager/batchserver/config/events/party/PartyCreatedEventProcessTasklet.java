@@ -1,41 +1,35 @@
-package com.villager.batchserver.event.service.impl;
+package com.villager.batchserver.config.events.party;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.villager.batchserver.config.properties.PartyProperties;
 import com.villager.batchserver.event.body.PartyCreatedBody;
 import com.villager.batchserver.event.channels.PartyCreatedEventChannel;
-import com.villager.batchserver.event.consumer.VillagerEvent;
 import com.villager.batchserver.event.domain.Member;
 import com.villager.batchserver.event.domain.repository.MemberQueryRepository;
 import com.villager.batchserver.event.dto.PartyCreatedDto;
-import com.villager.batchserver.event.service.VillagerEventProcessService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.List;
 
-import static com.villager.batchserver.event.consumer.VillagerEventType.PARTY_CREATED_EVENT;
+import static com.villager.batchserver.config.events.party.PartyCreatedEventBatchConfig.PARTY_CREATED_EVENT_BATCH_CONFIG_KEY;
+import static org.springframework.batch.repeat.RepeatStatus.FINISHED;
 
-@Service
+@Component
 @RequiredArgsConstructor
-@Slf4j
-public class PartyCreatedEventProcessService implements VillagerEventProcessService {
+public class PartyCreatedEventProcessTasklet implements Tasklet {
     private final PartyProperties partyProperties;
     private final MemberQueryRepository memberQueryRepository;
     private final PartyCreatedEventChannel eventChannel;
-    private final ObjectMapper mapper;
-
 
     @Override
-    public boolean isSupport(VillagerEvent event) {
-        return event.getEventType().equals(PARTY_CREATED_EVENT);
-    }
+    public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
-    @Override
-    public void process(VillagerEvent event) {
-        PartyCreatedBody body = getBody(event);
+        PartyCreatedBody body = getBody(contribution);
 
         for (String tag : body.getTags()) {
             long tagTotalCount = memberQueryRepository.getTagTotalCount(body.getTownId(), tag);
@@ -48,19 +42,27 @@ public class PartyCreatedEventProcessService implements VillagerEventProcessServ
                             .getTagAttentionMember(body.getTownId(), tag, i, (i + batchSize) - 1);
                     if(tagAttentionMember != null && tagAttentionMember.size() > 0) {
                         for (Member member : tagAttentionMember) {
-//                            SseEmitter emitter = eventChannel.getEmitter(member.getId());
-//                            eventChannel.sendToClient(emitter, member.getId(),
-//                                    PartyCreatedDto.createPartyCreated(body, tag));
+                            SseEmitter emitter = eventChannel.getEmitter(member.getId());
+                            if(emitter != null) {
+                                eventChannel.sendToClient(emitter, member.getId(),
+                                        PartyCreatedDto.ResponsePartyCreatedApi.createPartyCreated(body, tag));
+                            }
                             // log.info("sendToClient : {}", member.getId());
                         }
                     }
                 }
             }
         }
+
+        return FINISHED;
     }
 
-    private PartyCreatedBody getBody(VillagerEvent event) {
-        return mapper.convertValue(event.getBody(), PartyCreatedBody.class);
+    private PartyCreatedBody getBody(StepContribution contribution) {
+        return (PartyCreatedBody) contribution.getStepExecution()
+                .getJobExecution()
+                .getJobParameters()
+                .getParameters()
+                .get(PARTY_CREATED_EVENT_BATCH_CONFIG_KEY)
+                .getValue();
     }
 }
-

@@ -7,6 +7,13 @@ party:
     time-out: 600000
   name: party-create
 
+cultural:
+  path: http://openapi.seoul.go.kr:8088
+  key: ENC(lZHBx3KQHkjbZBxe8G11zRT60WAO7yNNfOVYwytp52Mg8aO7Zuk3vg==)
+  type: json
+  service: ENC(vCvraep7lzDluve303FpdtI1FrqbDZqQwBygt4TwtJA=)
+  batch-size: 100
+
 jasypt:
   encryptor:
     bean: jasyptStringEncryptor
@@ -24,6 +31,12 @@ spring:
         format_sql: false
     hibernate:
       ddl-auto: none
+
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: false
 ---
 spring:
   config:
@@ -34,7 +47,12 @@ spring:
     username: ENC(AYc9538zUIMEWTOc2jCJnWJmpzKhdXpy)
     password: ENC(m4S3uxQO2eV/OEZdREvW/LTMYPKIX7nB)
   jpa:
+    properties:
+      hibernate:
+        format_sql: false
     show-sql: true
+    hibernate:
+      ddl-auto: update
 
 ---
 spring:
@@ -62,4 +80,9 @@ spring:
     username: ENC(zdrkAKUJiXdo4sztev9kQw==)
     password: ENC(r2BUekYDafkZJUokhA1vvZrWDVMqNzl7)
   jpa:
+    properties:
+      hibernate:
+        format_sql: false
     show-sql: false
+    hibernate:
+      ddl-auto: update

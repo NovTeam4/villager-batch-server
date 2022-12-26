@@ -1,4 +1,6 @@
-package com.villager.batchserver.event.domain;
+package com.villager.batchserver.event.domain.repository;
+
+import com.villager.batchserver.event.domain.Member;
 
 import java.util.List;
 
